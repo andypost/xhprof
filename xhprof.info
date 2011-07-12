@@ -1,0 +1,5 @@
+; $Id$
+name = XHProf
+description = Provides integration with XHProf, a hierarchical profiler for PHP.
+core = 7.x
+package = Performance
