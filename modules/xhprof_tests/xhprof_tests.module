@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Save XHProf data for a run.
+ * 
+ * @param mixed $run_type
+ * @param mixed $simpletest_test_id
+ * @param mixed $run_data
+ * @return boolean
+ */
+function xhprof_tests_save_run_data($run_type, $simpletest_test_id, $run_data) {
+  // TODO: this should be pluggable, not hard-coded to use the database.
+  $fields = array(
+    'test_id' => $simpletest_test_id,
+    'run_data' => $run_data,
+    'run_type' => $run_type,
+  );
+  try {
+    db_insert('xhprof_tests_profile_run')
+      ->fields($fields)
+      ->execute();
+    return TRUE;
+  }
+  catch (Exception $e) {
+    return FALSE;
+  }
+}
+
