@@ -14,6 +14,9 @@ if (isset($_GET['xhprof_tests_do_run']) && ($test_prefix = drupal_valid_test_ua(
   }
   Database::addConnectionInfo('default', 'default', $connection_info['default']);
 
+  // xhprof_tests module is probably not enabled in the child Drupal, so we need
+  // to take care to load the code ourselves.
+  require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'xhprof_tests') . '/xhprof_tests.module';
   xhprof_tests_save_run_data($_GET['xhprof_tests_do_run'], $_GET['simpletest_test_id'], $run_data);
 }
 
