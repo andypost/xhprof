@@ -1,5 +1,8 @@
-; $Id$
-name = XHProf
-description = Provides integration with XHProf, a hierarchical profiler for PHP.
+; $Id:
+name = xhprof
+description = XHProf integration.
+package = Development
 core = 7.x
-package = Performance
+
+files[] = XHProfRunsInterface.inc
+files[] = XHProfRunsFile.inc
