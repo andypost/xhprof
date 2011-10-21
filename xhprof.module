@@ -7,30 +7,42 @@ require_once(dirname(__FILE__) .'/xhprof.inc');
 function xhprof_menu() {
   $items = array();
   $items['admin/reports/xhprof'] = array(
-    'title' => 'xhprof',
+    'title' => 'XHProf runs',
     'page callback' => 'xhprof_run_list',
-    'access arguments' => array('access devel information'),
-    'description' => 'blah.',
+    'access arguments' => array('access xhprof data'),
+    'description' => 'View XHProf profiling data.',
   );
   $items['admin/reports/xhprof/%'] = array(
     'title' => 'XHProf view',
     'page callback' => 'xhprof_display_page',
     'page arguments' => array(3),
-    'access arguments' => array('access devel information'),
+    'access arguments' => array('access xhprof data'),
   );
   $items['admin/reports/xhprof/diff/%/%'] = array(
     'title' => 'XHProf view',
     'page callback' => 'xhprof_display_diff_page',
     'page arguments' => array(4, 5),
-    'access arguments' => array('access devel information'),
+    'access arguments' => array('access xhprof data'),
   );
   $items['admin/reports/xhprof/%/symbol/%'] = array(
     'title' => 'XHProf view',
     'page callback' => 'xhprof_display_page',
     'page arguments' => array(3, 5),
-    'access arguments' => array('access devel information'),
+    'access arguments' => array('access xhprof data'),
   );
   return $items;
+}
+
+
+/**
+ * Implement hook_permission().
+ */
+function xhprof_permission() {
+  return array(
+    'access xhprof data' => array(
+      'title' => t('Access XHProf data'),
+    ),
+  );
 }
 
 /**
@@ -92,12 +104,12 @@ function xhprof_shutdown() {
 }
 
 /**
- * See devel_shutdown() which registers this function as a shutdown function. Displays developer information in the footer.
+ * See xhprof_shutdown() which registers this function as a shutdown function. Displays xhprof link in the footer.
  */
 function xhprof_shutdown_real() {
   global $user;
   $output = $txt = '';
-  if (isset($user) && user_access('access devel information')) {
+  if (isset($user) && user_access('access xhprof data')) {
     $output .= xhprof_shutdown_summary($queries);
   }
   if ($output) {
