@@ -231,7 +231,7 @@ function xhprof_param_defaults() {
 
 function xhprof_display_page($run_id, $symbol = NULL) {
   drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
-  return xhprof_display_run(array($run_id), $symbol = NULL);
+  return xhprof_display_run(array($run_id), $symbol);
 }
 
 function xhprof_display_diff_page($run1, $run2, $symbol = NULL) {
