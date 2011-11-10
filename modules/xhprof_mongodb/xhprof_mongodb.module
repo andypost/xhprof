@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Implementation of hook_xhprof_ui_load_classes().
+ * Implementation of hook_xhprof_classes_alter().
  */
-function xhprof_mongodb_xhprof_ui_load_classes() {
-  module_load_include('inc', 'xhprof_mongodb', 'MongodbXHProfRuns');
+function xhprof_mongodb_xhprof_classes_alter(&$classes) {
+  $classes[] = 'MongodbXHProfRuns';
 }

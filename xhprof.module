@@ -30,6 +30,15 @@ function xhprof_menu() {
     'page arguments' => array(3, 5),
     'access arguments' => array('access xhprof data'),
   );
+  $items['admin/config/development/xhprof'] = array(
+    'title' => 'XHProf settings',
+    'description' =>  'Configure XHProf profiler settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('xhprof_admin_settings'),
+    'file' => 'xhprof.admin.inc',
+    'access arguments' => array('administer site configuration'),
+  );
+
   return $items;
 }
 
@@ -73,11 +82,21 @@ function xhprof_xhprof_enable() {
   if (xhprof_is_enabled()) {
     // @todo: consider a variable per-flag instead.
     xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+    return TRUE;
+  }
+  else {
+    return FALSE;
   }
 }
 
 function xhprof_is_enabled() {
-  return extension_loaded('xhprof') && variable_get('xhprof_enabled', FALSE);
+  if (extension_loaded('xhprof') && variable_get('xhprof_enabled', FALSE)) {
+    $enabled = TRUE;
+    if (arg(0) == 'admin' && variable_get('xhprof_disable_admin_paths', TRUE)) {
+      $enabled = FALSE;
+    }
+  }
+  return $enabled;
 }
 
 /**
@@ -85,8 +104,9 @@ function xhprof_is_enabled() {
  */
 function xhprof_boot() {
   // Initialize XHProf.
-  xhprof_xhprof_enable();
-  drupal_register_shutdown_function('xhprof_shutdown');
+  if (xhprof_xhprof_enable()) {
+    drupal_register_shutdown_function('xhprof_shutdown');
+  }
 }
 
 /**
@@ -110,16 +130,10 @@ function xhprof_shutdown_real() {
   global $user;
   $output = $txt = '';
   if (isset($user) && user_access('access xhprof data')) {
-    $output .= xhprof_shutdown_summary($queries);
+    $output .= '<div class="xhprof-ui">' . xhprof_link($GLOBALS['xhprof_run_id']) . '</div>';
   }
   if ($output) {
     print $output;
-  }
-}
-
-function xhprof_shutdown_summary($queries) {
-  if (xhprof_is_enabled()) {
-    return '<div class="xhprof-ui">' . xhprof_link($GLOBALS['xhprof_run_id']) . '</div>';
   }
 }
 
@@ -155,20 +169,20 @@ function _xhprof_get_object() {
   static $xhprof_object = NULL;
   if (empty($xhprof_object)) {
     $class = variable_get('xhprof_default_class', 'XHProfRunsFile');
-    $xhprof_object = new $class();
+    if (class_exists($class)) {
+      $xhprof_object = new $class();
+    }
+    else {
+      watchdog('xhprof', t('Unable to load default class %class!'), array('%class' => $class), WATCHDOG_CRITICAL);
+    }
   }
   return $xhprof_object;
 }
 
-function xhprof_get_subclasses($parent_class_name = 'XHProfRunsFile') {
+function xhprof_get_classes() {
   xhprof_include();
-  $classes = array();
-  foreach (get_declared_classes() as $class_name) {
-    $ref = new ReflectionClass($class_name);
-    if ($ref->implementsInterface('XHProfRunsInterface')) {
-      $classes[] = $class_name;
-    }
-  }
+  $classes = array('XHProfRunsFile');
+  drupal_alter('xhprof_classes', $classes);
   return $classes;
 }
 
