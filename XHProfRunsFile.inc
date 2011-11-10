@@ -88,10 +88,10 @@ class XHProfRunsFile implements XHProfRunsInterface {
 
   public function getRuns($stats, $limit = 50, $skip = 0) {
     $files = $this->scanXHProfDir('/tmp', variable_get('site_name', ''));
-    $files = array_map(function($f) {
-      $f['date'] = strtotime($f['date']);
-      return $f;
-    }, $files);
+    foreach ($files as $i => $file) {
+      $file['date'] = strtotime($file['date']);
+      $files[$i] = $file;
+    }
     return $files;
   }
 
