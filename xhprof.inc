@@ -6,7 +6,6 @@ define('XHPROF_STRING_PARAM', 1);
 define('XHPROF_UINT_PARAM',   2);
 define('XHPROF_FLOAT_PARAM',  3);
 define('XHPROF_BOOL_PARAM',   4);
-
 // default column to sort on -- wall time
 $sort_col = "wt";
 
@@ -196,27 +195,6 @@ $metrics = null;
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-
-//
-// XHProf: A Hierarchical Profiler for PHP
-//
-// XHProf has two components:
-//
-//  * This module is the UI/reporting component, used
-//    for viewing results of XHProf runs from a browser.
-//
-//  * Data collection component: This is implemented
-//    as a PHP extension (XHProf).
-//
-// @author Kannan Muthukkaruppan
-//
-
-if ($path = variable_get('devel_xhprof_directory', '')) {
-  include_once $path . '/xhprof_lib/utils/xhprof_lib.php';
-  include_once $path . '/xhprof_lib/utils/xhprof_runs.php';
-}
-
-
 
 /**
  * Our coding convention disallows relative paths in hrefs.
