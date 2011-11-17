@@ -90,6 +90,7 @@ function xhprof_xhprof_enable() {
 }
 
 function xhprof_is_enabled() {
+  $enabled = FALSE;
   if (extension_loaded('xhprof') && variable_get('xhprof_enabled', FALSE)) {
     $enabled = TRUE;
     if (arg(0) == 'admin' && variable_get('xhprof_disable_admin_paths', TRUE)) {
