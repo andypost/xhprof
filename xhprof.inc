@@ -370,7 +370,7 @@ function xhprof_xhprof_render_link($content, $href, $class='', $id='', $title=''
 function xhprof_sort_cbk($a, $b) {
   global $diff_mode;
 
-  $sort_col = isset($_GET['sort']) ? $_GET['sort'] : '';
+  $sort_col = isset($_GET['sort']) ? $_GET['sort'] : 'wt';
 
   if ($sort_col == "fn") {
     // case insensitive ascending sort for function xhprof_names
@@ -1059,15 +1059,18 @@ function xhprof_print_pc_array($url_params, $results, $base_ct, $base_info, $par
     $title = '<strong>' . $title . 's</strong>';
   }
 
-  $trail = menu_get_active_trail();
+  // Get the current path info to assemble the symbol links. There is probably
+  // a better way to do this…
+  $path_parts = explode('/', $_GET['q']);
+  array_pop($path_parts);
+  $symbol_path = implode('/', $path_parts);
+
   $rows[] = array(array('data' => $title, 'colspan' => 11));
+  usort($results, 'xhprof_sort_cbk');
+
   foreach ($results as $info) {
     $row = array();
-    //$href = "$base_path/?" .  http_build_query(xhprof_array_set($url_params, 'symbol', $info["fn"]));
-    //$row[] = l($info["fn"], $trail[1]["href"] . '/' . $info["fn"]);
-    $row[] = l($info["fn"], $info["fn"]);
-
-    //$row[] = xhprof_xhprof_render_link($info["fn"], $href);
+    $row[] = l($info["fn"], $symbol_path . '/' . $info["fn"]);
     $row = array_merge($row, xhprof_pc_info($info, $base_ct, $base_info, $parent));
     $rows[] = $row;
   }
@@ -1191,8 +1194,10 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
 
   $output .= "<h4>";
   $output .= "Parent/Child $regr_impr report for <strong>$rep_symbol</strong>";
-  $callgraph_href = "$base_path/callgraph.php?" . http_build_query(xhprof_array_set($url_params, 'func', $rep_symbol));
-  $output .= " <a href='$callgraph_href'>[View Callgraph $diff_text]</a></h4>";
+  // TODO: Maybe include this?
+  //$callgraph_href = "$base_path/callgraph.php?" . http_build_query(xhprof_array_set($url_params, 'func', $rep_symbol));
+  //$output .= " <a href='$callgraph_href'>[View Callgraph $diff_text]</a>";
+  $output .= "</h4>";
 
   $headers = array();
   $rows = array();
