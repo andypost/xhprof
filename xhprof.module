@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(__FILE__) .'/xhprof.inc');
+
+require_once(dirname(__FILE__) . '/xhprof.inc');
 
 define('XHPROF_PATH', 'admin/reports/xhprof');
 
@@ -46,7 +47,7 @@ function xhprof_menu() {
 
 
 /**
- * Implement hook_permission().
+ * Implementation of hook_permission().
  */
 function xhprof_permission() {
   return array(
@@ -71,7 +72,7 @@ function xhprof_theme() {
 }
 
 /**
- * Implements hook_views_api().
+ * Implementation of hook_views_api().
  */
 function xhprof_views_api() {
   return array(
@@ -80,6 +81,9 @@ function xhprof_views_api() {
   );
 }
 
+/**
+ * Conditionally enable XHProf profiling.
+ */
 function xhprof_xhprof_enable() {
   if (xhprof_is_enabled()) {
     // @todo: consider a variable per-flag instead.
@@ -91,6 +95,9 @@ function xhprof_xhprof_enable() {
   }
 }
 
+/**
+ * Check whether XHProf should be enabled for the current request.
+ */
 function xhprof_is_enabled() {
   $enabled = FALSE;
   if (extension_loaded('xhprof') && variable_get('xhprof_enabled', FALSE)) {
@@ -169,7 +176,7 @@ function xhprof_shutdown_xhprof() {
 function xhprof_link($run_id, $type = 'link') {
   $namespace = variable_get('site_name', '');  // namespace for your application
   $url  = base_path() . XHPROF_PATH . '/' . $run_id;
-  return $type == 'url' ? $url : t('<a href="@xhprof">XHProf output</a>. ', array('@xhprof' => $url));
+  return $type == 'url' ? $url : t('<a href="@xhprof">XHProf output</a>.', array('@xhprof' => $url)) . ' ';
 }
 
 /**
@@ -194,12 +201,15 @@ function _xhprof_get_object() {
       $xhprof_object = new $class();
     }
     else {
-      watchdog('xhprof', t('Unable to load default class %class!'), array('%class' => $class), WATCHDOG_CRITICAL);
+      watchdog('xhprof', 'Unable to load default class %class!', array('%class' => $class), WATCHDOG_CRITICAL);
     }
   }
   return $xhprof_object;
 }
 
+/**
+ * List all available XHProf storage backends.
+ */
 function xhprof_get_classes() {
   xhprof_include();
   $classes = array('XHProfRunsFile');
@@ -207,6 +217,9 @@ function xhprof_get_classes() {
   return $classes;
 }
 
+/**
+ * Display list of saved XHProf runs.
+ */
 function xhprof_run_list() {
   global $pager_page_array, $pager_total, $pager_total_items;
   xhprof_include();
@@ -250,6 +263,9 @@ function xhprof_run_list() {
   return $output;
 }
 
+/**
+ * Get default URL parameters for XHProf.
+ */
 function xhprof_param_defaults() {
   // param name, its type, and default value
   return array(
@@ -264,16 +280,25 @@ function xhprof_param_defaults() {
   );
 }
 
+/**
+ * Page callback to display a XHProf run.
+ */
 function xhprof_display_page($run_id, $symbol = NULL) {
   drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
   return xhprof_display_run(array($run_id), $symbol);
 }
 
+/**
+ * Page callback to display a difference of two XHProf runs.
+ */
 function xhprof_display_diff_page($run1, $run2, $symbol = NULL) {
   drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
   return xhprof_display_run(array($run1, $run2), $symbol = NULL);
 }
 
+/**
+ * Display XHProf run report.
+ */
 function xhprof_display_run($run_ids, $symbol = NULL) {
   if (count($run_ids) === 1) {
     $_GET['run'] = $run_ids[0];
@@ -323,13 +348,13 @@ function xhprof_display_run($run_ids, $symbol = NULL) {
         $wts_array  = explode(",", $wts);
       }
       else {
-        $wts_array = null;
+        $wts_array = NULL;
       }
-      $data = xhprof_aggregate_runs($xhprof_runs_impl, $runs_array, $wts_array, $source, false);
+      $data = xhprof_aggregate_runs($xhprof_runs_impl, $runs_array, $wts_array, $source, FALSE);
       $xhprof_data = $data['raw'];
       $description = $data['description'];
     }
-    xhprof_init_metrics($xhprof_data, $symbol, $sort, false);
+    xhprof_init_metrics($xhprof_data, $symbol, $sort, FALSE);
     $output .= xhprof_profiler_report($url_params, $symbol, $sort, $run_id, $description, $xhprof_data);
   }
   elseif ($run1 && $run2) {
@@ -337,7 +362,7 @@ function xhprof_display_run($run_ids, $symbol = NULL) {
     $xhprof_data1 = $xhprof_runs_impl->get_run($run1, $source, $description1);
     $xhprof_data2 = $xhprof_runs_impl->get_run($run2, $source, $description2);
     // Initialize what metrics we'll display based on data in Run2
-    $output .= xhprof_init_metrics($xhprof_data2, $symbol, $sort, true);
+    $output .= xhprof_init_metrics($xhprof_data2, $symbol, $sort, TRUE);
     $output .= xhprof_profiler_report($url_params, $symbol, $sort, $run1, $description1, $xhprof_data1, $run2, $description2, $xhprof_data2);
   }
   else {
@@ -351,7 +376,7 @@ function xhprof_scandir($dir, $source) {
   if (is_dir($dir)) {
     $runs = array();
     foreach (glob("$dir/*.$source") as $file) {
-      list($run,$source) = explode('.', basename($file));
+      list($run, $source) = explode('.', basename($file));
       $runs[] = array(
         'run_id' => $run,
         'source' => $source,
@@ -363,13 +388,16 @@ function xhprof_scandir($dir, $source) {
   return array_reverse($runs);
 }
 
+/**
+ * Theme function to display XHProf run summary.
+ */
 function theme_xhprof_overall_summary($variables) {
   $output = '';
   // Extract variables: $totals, $possible_metrics, $metrics, $display_calls;
   extract($variables);
   $rows = array();
   foreach ($metrics as $metric) {
-    $rows[] = array('<strong>Total ' . xhprof_stat_description($metric) . ':</strong>', number_format($totals[$metric]) .  " " . $possible_metrics[$metric][1]);
+    $rows[] = array('<strong>Total ' . xhprof_stat_description($metric) . ':</strong>', number_format($totals[$metric]) . " " . $possible_metrics[$metric][1]);
   }
 
   if ($display_calls) {
@@ -380,6 +408,9 @@ function theme_xhprof_overall_summary($variables) {
   return $output;
 }
 
+/**
+ * Theme function to display list of XHProf function calls.
+ */
 function theme_xhprof_run_table($variables) {
   // Extract variables: $stats, $totals, $url_params, $title, $flat_data, $limit.
   extract($variables);

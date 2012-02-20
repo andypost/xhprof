@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @file
+ * Admin page callbacks for the XHProf module.
+ */
+
+/**
+ * Administrative settings form for XHProf module.
+ */
 function xhprof_admin_settings() {
   $description = extension_loaded('xhprof') ? t('Profile requests with the xhprof php extension.') : '<span class="warning">' . t('You must enable the <a href="!url">xhprof php extension</a> to use this feature.', array('!url' => url('http://techportal.ibuildings.com/2009/12/01/profiling-with-xhprof/'))) . '</span>';
   $form['xhprof_enabled'] = array(

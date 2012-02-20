@@ -1,4 +1,3 @@
-; $Id:
 name = XHProf MongoDB
 description = UI for xhprof runs.
 package = Development

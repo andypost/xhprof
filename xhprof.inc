@@ -10,10 +10,10 @@ define('XHPROF_BOOL_PARAM',   4);
 $sort_col = "wt";
 
 // default is "single run" report
-$diff_mode = false;
+$diff_mode = FALSE;
 
 // call count data present?
-$display_calls = true;
+$display_calls = TRUE;
 
 function xhprof_sortable_columns() {
 // The following column headers are sortable
@@ -178,7 +178,7 @@ $totals_2 = 0;
 /*
  * The subset of $possible_metrics that is present in the raw profile data.
  */
-$metrics = null;
+$metrics = NULL;
 
 
 //  Copyright (c) 2009 Facebook
@@ -213,7 +213,7 @@ $base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), "/");
  * can be specified in the generated HTML.
  *
  */
-function xhprof_xhprof_include_js_css($ui_dir_url_path = null) {
+function xhprof_xhprof_include_js_css($ui_dir_url_path = NULL) {
 
   if (empty($ui_dir_url_path)) {
     $ui_dir_url_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), "/");
@@ -402,7 +402,7 @@ function xhprof_sort_cbk($a, $b) {
  *
  * @author Kannan
  */
-function xhprof_init_metrics($xhprof_data, $rep_symbol, $sort, $diff_report = false) {
+function xhprof_init_metrics($xhprof_data, $rep_symbol, $sort, $diff_report = FALSE) {
   global $stats;
   global $pc_stats;
   global $metrics;
@@ -434,10 +434,10 @@ function xhprof_init_metrics($xhprof_data, $rep_symbol, $sort, $diff_report = fa
     // is present for "main()". But currently "ct"
     // metric is artificially set to 1. So, relying
     // on absence of "wt" metric instead.
-    $display_calls = false;
+    $display_calls = FALSE;
   }
   else {
-    $display_calls = true;
+    $display_calls = TRUE;
   }
 
   // parent/child report doesn't support exclusive times yet.
@@ -677,8 +677,8 @@ function xhprof_profiler_report($url_params, $rep_symbol, $sort, $run1, $run1_de
 
     // Single function xhprof_report with parent/child information.
     if ($diff_mode) {
-      $info1 = isset($symbol_tab1[$rep_symbol]) ? $symbol_tab1[$rep_symbol] : null;
-      $info2 = isset($symbol_tab2[$rep_symbol]) ? $symbol_tab2[$rep_symbol] : null;
+      $info1 = isset($symbol_tab1[$rep_symbol]) ? $symbol_tab1[$rep_symbol] : NULL;
+      $info2 = isset($symbol_tab2[$rep_symbol]) ? $symbol_tab2[$rep_symbol] : NULL;
       $output .= xhprof_symbol_report($url_params, $run_delta, $symbol_tab[$rep_symbol], $sort, $rep_symbol,
                                          $run1, $info1, $run2, $info2);
     }
@@ -968,11 +968,11 @@ function xhprof_full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
   $output .= "<br>";
 
   if (!empty($url_params['all'])) {
-    $all = true;
+    $all = TRUE;
     $limit = 0;    // display all rows
   }
   else {
-    $all = false;
+    $all = FALSE;
     $limit = 100;  // display only limited number of rows
   }
 
@@ -1100,7 +1100,7 @@ function xhprof_print_symbol_summary($symbol_info, $stat, $base) {
  * @author Kannan
  */
 function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_symbol, $run1,
-                                 $symbol_info1 = null, $run2 = 0, $symbol_info2 = null) {
+                                 $symbol_info1 = NULL, $run2 = 0, $symbol_info2 = NULL) {
   global $vwbar;
   global $vbar;
   global $totals;
@@ -1144,8 +1144,8 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
       $output .= "<td>Number of function xhprof_Calls</td>";
       $output .= xhprof_print_num($symbol_info1["ct"], $format_cbk["ct"]);
       $output .= xhprof_print_num($symbol_info2["ct"], $format_cbk["ct"]);
-      $output .= xhprof_print_num($symbol_info2["ct"] - $symbol_info1["ct"], $format_cbk["ct"], true);
-      $output .= xhprof_print_pct($symbol_info2["ct"] - $symbol_info1["ct"], $symbol_info1["ct"], true);
+      $output .= xhprof_print_num($symbol_info2["ct"] - $symbol_info1["ct"], $format_cbk["ct"], TRUE);
+      $output .= xhprof_print_pct($symbol_info2["ct"] - $symbol_info1["ct"], $symbol_info1["ct"], TRUE);
       $output .= '</tr>';
     }
 
@@ -1157,8 +1157,8 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
       $output .= "<td>" . str_replace("<br>", " ", $descriptions[$m]) . "</td>";
       $output .= xhprof_print_num($symbol_info1[$m], $format_cbk[$m]);
       $output .= xhprof_print_num($symbol_info2[$m], $format_cbk[$m]);
-      $output .= xhprof_print_num($symbol_info2[$m] - $symbol_info1[$m], $format_cbk[$m], true);
-      $output .= xhprof_print_pct($symbol_info2[$m] - $symbol_info1[$m], $symbol_info1[$m], true);
+      $output .= xhprof_print_num($symbol_info2[$m] - $symbol_info1[$m], $format_cbk[$m], TRUE);
+      $output .= xhprof_print_pct($symbol_info2[$m] - $symbol_info1[$m], $symbol_info1[$m], TRUE);
       $output .= '</tr>';
 
       // AVG (per call) Inclusive stat for metric
@@ -1272,7 +1272,7 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
   usort($results, 'xhprof_sort_cbk');
 
   if (count($results) > 0) {
-    $pc_row = xhprof_print_pc_array($url_params, $results, $base_ct, $base_info, true, $run1, $run2);
+    $pc_row = xhprof_print_pc_array($url_params, $results, $base_ct, $base_info, TRUE, $run1, $run2);
     $rows = array_merge($rows, $pc_row);
   }
 
@@ -1293,7 +1293,7 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
   usort($results, 'xhprof_sort_cbk');
 
   if (count($results)) {
-    $pc_row = xhprof_print_pc_array($url_params, $results, $base_ct, $base_info, false, $run1, $run2);
+    $pc_row = xhprof_print_pc_array($url_params, $results, $base_ct, $base_info, FALSE, $run1, $run2);
     $rows = array_merge($rows, $pc_row);
   }
 
@@ -1313,9 +1313,9 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
   $output .= "var metrics_col  = new Array();\n";
   $output .= "var metrics_desc  = new Array();\n";
   if ($diff_mode) {
-    $output .= "var diff_mode = true;\n";
+    $output .= "var diff_mode = TRUE;\n";
   } else {
-    $output .= "var diff_mode = false;\n";
+    $output .= "var diff_mode = FALSE;\n";
   }
   $column_index = 3; // First three columns are Func Name, Calls, Calls%
   foreach ($metrics as $metric) {
@@ -1340,7 +1340,7 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
 function xhprof_profiler_single_run_report ($url_params, $xhprof_data, $run_desc, $rep_symbol, $sort, $run) {
   $output = '';
 
-  xhprof_init_metrics($xhprof_data, $rep_symbol, $sort, false);
+  xhprof_init_metrics($xhprof_data, $rep_symbol, $sort, FALSE);
   $output .= xhprof_profiler_report($url_params, $rep_symbol, $sort, $run, $run_desc, $xhprof_data);
   return $output;
 }
@@ -1365,7 +1365,7 @@ function xhprof_profiler_single_run_report ($url_params, $xhprof_data, $run_desc
 //
 //  $output = '';
 //  // Initialize what metrics we'll display based on data in Run2
-//  $output .= xhprof_init_metrics($xhprof_data2, $rep_symbol, $sort, true);
+//  $output .= xhprof_init_metrics($xhprof_data2, $rep_symbol, $sort, TRUE);
 //
 //  $output .= xhprof_profiler_report($url_params,
 //                  $rep_symbol,
@@ -1435,9 +1435,9 @@ function xhprof_displayXHProfReport($xhprof_runs_impl, $options) {
         $wts_array  = explode(",", $wts);
       }
       else {
-        $wts_array = null;
+        $wts_array = NULL;
       }
-      $data = xhprof_aggregate_runs($xhprof_runs_impl, $runs_array, $wts_array, $source, false);
+      $data = xhprof_aggregate_runs($xhprof_runs_impl, $runs_array, $wts_array, $source, FALSE);
       $xhprof_data = $data['raw'];
       $description = $data['description'];
     }
@@ -1596,7 +1596,7 @@ function xhprof_parse_parent_child($parent_child) {
     return $ret;
   }
 
-  return array(null, $ret[0]);
+  return array(NULL, $ret[0]);
 }
 
 
