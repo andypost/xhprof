@@ -105,8 +105,8 @@ function xhprof_is_enabled() {
     if (arg(0) == 'admin' && variable_get('xhprof_disable_admin_paths', TRUE)) {
       $enabled = FALSE;
     }
-    $interval = variable_get('xhprof_interval', '');
-    if (isset($interval) && mt_rand(1, $interval) % $interval != 0) {
+    $interval = variable_get('xhprof_interval', 1);
+    if ($interval && mt_rand(1, $interval) % $interval != 0) {
       $enabled = FALSE;
     }
   }
