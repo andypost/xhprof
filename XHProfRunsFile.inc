@@ -42,11 +42,13 @@ class XHProfRunsFile implements XHProfRunsInterface {
       if (empty($dir)) {
         // some default that at least works on unix...
         $dir = "/tmp";
+        /* @todo - Put this somewhere more sensible.
         watchdog("xhprof", "Warning: Must specify directory location for XHProf runs. " .
                      "Trying {$dir} as default. You can either pass the " .
                      "directory location as an argument to the constructor " .
                      "for XHProfRuns_Default() or set xhprof.output_dir " .
                      "ini param.");
+         */
       }
     }
     $this->dir = $dir;
