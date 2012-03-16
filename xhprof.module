@@ -174,8 +174,9 @@ function xhprof_shutdown_xhprof() {
 }
 
 function xhprof_link($run_id, $type = 'link') {
+  global $base_path;
   $namespace = variable_get('site_name', '');  // namespace for your application
-  $url  = base_path() . XHPROF_PATH . '/' . $run_id;
+  $url  = $base_path . XHPROF_PATH . '/' . $run_id;
   return $type == 'url' ? $url : t('<a href="@xhprof">XHProf output</a>.', array('@xhprof' => $url)) . ' ';
 }
 
