@@ -50,7 +50,8 @@ function xhprof_admin_settings() {
 }
 
 function xhprof_admin_settings_validate($form, &$form_state) {
-  if (isset($form_state['values']['xhprof_interval']) && (!is_numeric($form_state['values']['xhprof_interval']) || $form_state['values']['xhprof_interval'] <= 0 || $form_state['values']['xhprof_interval'] > mt_getrandmax())) {
+  // TODO: Simplify this.
+  if (isset($form_state['values']['xhprof_interval']) && $form_state['values']['xhprof_interval'] != '' && (!is_numeric($form_state['values']['xhprof_interval']) || $form_state['values']['xhprof_interval'] <= 0 || $form_state['values']['xhprof_interval'] > mt_getrandmax())) {
     form_set_error('xhprof_interval', 'The profiling interval must be set to a positive integer.');
   }
 }
