@@ -58,7 +58,7 @@ class XHProfRunsFile implements XHProfRunsInterface {
     $file_name = $this->file_name($run_id, $type);
 
     if (!file_exists($file_name)) {
-      watchdog("xhprof", "Could not find file $file_name");
+      watchdog("xhprof", "Could not find file %file_name", array('%file_name' => $file_name));
       $run_desc = "Invalid Run Id = $run_id";
       return NULL;
     }
@@ -86,7 +86,7 @@ class XHProfRunsFile implements XHProfRunsInterface {
       fclose($file);
     }
     else {
-      watchdog("xhprof", "Could not open %filename.", array('%file_name' => $file_name));
+      watchdog("xhprof", "Could not open %file_name.", array('%file_name' => $file_name));
     }
 
     // echo "Saved run in {$file_name}.\nRun id = {$run_id}.\n";
