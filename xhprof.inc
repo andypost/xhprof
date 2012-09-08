@@ -822,7 +822,7 @@ function xhprof_print_flat_data($url_params, $title, $flat_data, $sort, $run1, $
     if (array_key_exists($stat, xhprof_sortable_columns($stat))) {
       if (isset($_GET['sort']) && $stat == $_GET['sort']) {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
-        $header[] = array('data' => t($header_desc) . theme('tablesort_indicator', 'desc'));
+        $header[] = array('data' => t($header_desc) . theme('tablesort_indicator', array('style' => 'desc')));
       }
       else {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
@@ -1208,7 +1208,7 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
     if (array_key_exists($stat, xhprof_sortable_columns($stat))) {
       if ($stat == $sort) {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
-        $headers[] = array('data' => t($header_desc) . theme('tablesort_indicator', 'desc'));
+        $headers[] = array('data' => t($header_desc) . theme('tablesort_indicator', array('style' => 'desc')));
       }
       else {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
