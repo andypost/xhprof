@@ -127,13 +127,15 @@ function xhprof_boot() {
  * See xhprof_start() which registers this function as a shutdown function.
  */
 function xhprof_shutdown() {
-  // Register the real shutdown function so it runs later than other shutdown functions.
-  drupal_register_shutdown_function('xhprof_shutdown_real');
-
   global $xhprof_run_id;
-  $xhprof_run_id = xhprof_is_enabled() ? xhprof_shutdown_xhprof(): NULL;
-  if ($xhprof_run_id && function_exists('drush_log')) {
-    drush_log('xhprof link: ' . xhprof_link($xhprof_run_id, 'url'), 'notice');
+
+  if (xhprof_is_enabled() && $xhprof_run_id = xhprof_shutdown_xhprof()) {
+    // Register the real shutdown function so it runs later than other shutdown functions.
+    drupal_register_shutdown_function('xhprof_shutdown_real');
+
+    if (function_exists('drush_log')) {
+      drush_log('xhprof link: ' . xhprof_link($xhprof_run_id, 'url'), 'notice');
+    }
   }
 }
 
