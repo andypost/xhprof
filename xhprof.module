@@ -1,7 +1,5 @@
 <?php
 
-require_once(dirname(__FILE__) . '/xhprof.inc');
-
 define('XHPROF_PATH', 'admin/reports/xhprof');
 
 /**
@@ -81,11 +79,17 @@ function xhprof_views_api() {
   );
 }
 
+function xhprof_require() {
+  require_once(dirname(__FILE__) . '/xhprof.inc');
+}
+
 /**
  * Conditionally enable XHProf profiling.
  */
 function xhprof_xhprof_enable() {
   if (xhprof_is_enabled()) {
+    xhprof_require();
+
     // @todo: consider a variable per-flag instead.
     xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
     return TRUE;
@@ -303,6 +307,8 @@ function xhprof_display_diff_page($run1, $run2, $symbol = NULL) {
  * Display XHProf run report.
  */
 function xhprof_display_run($run_ids, $symbol = NULL) {
+  xhprof_require();
+
   if (count($run_ids) === 1) {
     $_GET['run'] = $run_ids[0];
     $run_id = $run_ids[0];
