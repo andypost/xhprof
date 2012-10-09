@@ -17,19 +17,20 @@ function xhprof_admin_settings() {
     '#description' => $description,
     '#disabled' => !extension_loaded('xhprof'),
   );
-  $form['xhprof_disable_admin_paths'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Disable profiling of admin pages'),
-    '#default_value' => variable_get('xhprof_disable_admin_paths', TRUE),
-  );
   $form['settings'] = array(
-    '#type' => 'container',
+    '#title' => t('Profiling settings'),
+    '#type' => 'fieldset',
     '#states' => array(
       'invisible' => array(
         'input[name="xhprof_enabled"]' => array('checked' => FALSE),
       ),
     ),
-  );  
+  );
+  $form['settings']['xhprof_disable_admin_paths'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Disable profiling of admin pages'),
+    '#default_value' => variable_get('xhprof_disable_admin_paths', TRUE),
+  );
   $form['settings']['xhprof_interval'] = array(
     '#type' => 'textfield',
     '#title' => 'Profiling interval',
@@ -38,7 +39,7 @@ function xhprof_admin_settings() {
   );
 
   $options = drupal_map_assoc(xhprof_get_classes());
-  $form['xhprof_default_class'] = array(
+  $form['settings']['xhprof_default_class'] = array(
     '#type' => 'radios',
     '#title' => t('XHProf storage'),
     '#default_value' => variable_get('xhprof_default_class', 'XHProfRunsFile'),
