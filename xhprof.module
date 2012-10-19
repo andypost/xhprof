@@ -445,15 +445,13 @@ function theme_xhprof_run_table($variables) {
     }
   }
 
-  $path = '/reports/xhprof/' . $run1 . '/symbol/';
+  $path = url(XHPROF_PATH . '/' . $run1, array('absolute' => TRUE)) . '/symbol/';
   // Table rows
   $rows = array();
-  $trail = menu_get_active_trail();
-
   $i = 0;
   foreach ($flat_data as $data) {
     $row = array(
-      array('data' => l($data["fn"], $trail[1]["href"] . $path . $data["fn"])),
+      array('data' => l($data["fn"], $path . $data["fn"])),
       array('data' => xhprof_print_num($data['ct'], NULL, TRUE), 'class' => 'xhprof_micro'),
       array('data' => xhprof_print_pct($data['ct'], $totals['ct'], TRUE), 'class' => 'xhprof_percent'),
       array('data' => xhprof_print_num($data['wt'], NULL, TRUE), 'class' => 'xhprof_micro'),
