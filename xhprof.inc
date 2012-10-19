@@ -640,7 +640,7 @@ function xhprof_profiler_report($url_params, $rep_symbol, $sort, $run1, $run1_de
 
   // set up the action links for operations that can be done on this report
   $links = array();
-  $path_parts = explode('/', $_GET['q']);
+  $path_parts = explode('/', current_path());
   array_pop($path_parts);
   $links[] = l("View Top Level $diff_text Report", implode('/', $path_parts));
 
@@ -821,11 +821,11 @@ function xhprof_print_flat_data($url_params, $title, $flat_data, $sort, $run1, $
     $desc = xhprof_stat_description($stat);
     if (array_key_exists($stat, xhprof_sortable_columns($stat))) {
       if (isset($_GET['sort']) && $stat == $_GET['sort']) {
-        $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
+        $header_desc = l(t($desc), current_path(), array('query' => array('sort' => $stat), t($desc)));
         $header[] = array('data' => t($header_desc) . theme('tablesort_indicator', array('style' => 'desc')));
       }
       else {
-        $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
+        $header_desc = l(t($desc), current_path(), array('query' => array('sort' => $stat), t($desc)));
         $header[] = array('data' => t($header_desc));
       }
     }
@@ -1061,7 +1061,7 @@ function xhprof_print_pc_array($url_params, $results, $base_ct, $base_info, $par
 
   // Get the current path info to assemble the symbol links. There is probably
   // a better way to do this…
-  $path_parts = explode('/', $_GET['q']);
+  $path_parts = explode('/', current_path());
   array_pop($path_parts);
   $symbol_path = implode('/', $path_parts);
 
@@ -1207,11 +1207,11 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
     $desc = xhprof_stat_description($stat);
     if (array_key_exists($stat, xhprof_sortable_columns($stat))) {
       if ($stat == $sort) {
-        $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
+        $header_desc = l(t($desc), current_path(), array('query' => array('sort' => $stat), t($desc)));
         $headers[] = array('data' => t($header_desc) . theme('tablesort_indicator', array('style' => 'desc')));
       }
       else {
-        $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
+        $header_desc = l(t($desc), current_path(), array('query' => array('sort' => $stat), t($desc)));
         $headers[] = array('data' => t($header_desc));
       }
    }

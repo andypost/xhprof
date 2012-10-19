@@ -432,11 +432,11 @@ function theme_xhprof_run_table($variables) {
     $desc = xhprof_stat_description($stat);
     if (array_key_exists($stat, xhprof_sortable_columns($stat))) {
       if (isset($_GET['sort']) && $stat == $_GET['sort']) {
-        $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
+        $header_desc = l(t($desc), current_path(), array('query' => array('sort' => $stat), t($desc)));
         $header[] = array('data' => t($header_desc) . theme('tablesort_indicator', array('style' => 'desc')));
       }
       else {
-        $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
+        $header_desc = l(t($desc), current_path(), array('query' => array('sort' => $stat), t($desc)));
         $header[] = array('data' => t($header_desc));
       }
     }
@@ -485,7 +485,7 @@ function theme_xhprof_run_table($variables) {
     $display_link = "";
   }
   else {
-    $display_link = l(" [ <strong class=bubble>display all </strong>]", $_GET['q'], array('query' => xhprof_array_set($url_params, 'all', 1), 'html' => TRUE));
+    $display_link = l(" [ <strong class=bubble>display all </strong>]", current_path(), array('query' => xhprof_array_set($url_params, 'all', 1), 'html' => TRUE));
   }
   $output .= "<h3 align=center>$title $display_link</h3><br>";
   $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
