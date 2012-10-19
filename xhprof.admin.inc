@@ -42,7 +42,7 @@ function xhprof_admin_settings() {
   $form['settings']['xhprof_default_class'] = array(
     '#type' => 'radios',
     '#title' => t('XHProf storage'),
-    '#default_value' => variable_get('xhprof_default_class', 'XHProfRunsFile'),
+    '#default_value' => variable_get('xhprof_default_class', 'Drupal\xhprof\XHProfRunsFile'),
     '#options' => $options,
     '#description' => t('Choose an XHProf runs class.'),
   );

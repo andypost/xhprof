@@ -2,8 +2,10 @@
 
 /**
  * @file
- * Definition of XHProfRunsInterace.
+ * Definition of Drupal\xhprof\XHProfRunsInterface;
  */
+
+namespace Drupal\xhprof;
 
 interface XHProfRunsInterface {
   /**
@@ -11,7 +13,9 @@ interface XHProfRunsInterface {
   * are escaped automatically. You may also pass limit, order by, group by, or "where" to add those values,
   * all of which are used as is, no escaping.
   *
-  * @param array $stats Criteria by which to select columns
+  * @param array $stats
+   *  Criteria by which to select columns
+   *
   * @return resource
   */
   public function getRuns($stats, $limit = 50, $skip = 0);
@@ -19,4 +23,3 @@ interface XHProfRunsInterface {
   public function get_run($run_id, $type, &$run_desc);
   public function save_run($xhprof_data, $type, $run_id = NULL);
 }
-

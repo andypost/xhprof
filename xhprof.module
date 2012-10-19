@@ -174,7 +174,7 @@ function xhprof_shutdown_real() {
 function xhprof_shutdown_xhprof() {
   $namespace = variable_get('site_name', '');  // namespace for your application
   $xhprof_data = xhprof_disable();
-  $class = variable_get('xhprof_default_class', 'XHProfRunsFile');
+  $class = variable_get('xhprof_default_class', 'Drupal\xhprof\XHProfRunsFile');
   $xhprof_runs = new $class();
   return $xhprof_runs->save_run($xhprof_data, $namespace);
 }
@@ -194,8 +194,6 @@ function xhprof_include() {
   if (!$included) {
     module_load_include('inc', 'xhprof');
     module_invoke_all('xhprof_load_classes');
-    module_load_include('inc', 'xhprof', 'XHProfRunsInterface');
-    module_load_include('inc', 'xhprof', 'XHProfRunsFile');
     $included = TRUE;
   }
 }
@@ -203,7 +201,7 @@ function xhprof_include() {
 function _xhprof_get_object() {
   static $xhprof_object = NULL;
   if (empty($xhprof_object)) {
-    $class = variable_get('xhprof_default_class', 'XHProfRunsFile');
+    $class = variable_get('xhprof_default_class', 'Drupal\xhprof\XHProfRunsFile');
     if (class_exists($class)) {
       $xhprof_object = new $class();
     }
@@ -219,7 +217,7 @@ function _xhprof_get_object() {
  */
 function xhprof_get_classes() {
   xhprof_include();
-  $classes = array('XHProfRunsFile');
+  $classes = array('Drupal\xhprof\XHProfRunsFile');
   drupal_alter('xhprof_classes', $classes);
   return $classes;
 }
@@ -234,7 +232,7 @@ function xhprof_run_list() {
   $element = 0;
   $limit = 50;
 
-  $class = variable_get('xhprof_default_class', 'XHProfRunsFile');
+  $class = variable_get('xhprof_default_class', 'Drupal\xhprof\XHProfRunsFile');
   $xhprof_runs_impl = new $class();
   $pager_page_array = array($page);
   $pager_total_items[$element] = $xhprof_runs_impl->getCount();
@@ -337,7 +335,7 @@ function xhprof_display_run($run_ids, $symbol = NULL) {
   // future.
   extract($url_params);
 
-  $class = variable_get('xhprof_default_class', 'XHProfRunsFile');
+  $class = variable_get('xhprof_default_class', 'Drupal\xhprof\XHProfRunsFile');
   $xhprof_runs_impl = new $class();
   $output = '';
   if (isset($run_id)) {

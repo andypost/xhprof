@@ -4,6 +4,3 @@ package = Development
 core = 8.x
 
 configure = admin/config/development/xhprof
-
-files[] = XHProfRunsInterface.inc
-files[] = XHProfRunsFile.inc

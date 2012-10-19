@@ -2,13 +2,16 @@
 
 /**
  * @file
- * Definition of XHProfRunsFile.
+ * Definition of Drupal\xhprof\XHProfRunsFile;
  */
+
+namespace Drupal\xhprof;
+
+use Drupal\xhprof\XHProfRunsInterface;
 
 /**
  * XHProfRuns_Default is the default implementation of the
  * iXHProfRuns interface for saving/fetching XHProf runs.
- *
  */
 class XHProfRunsFile implements XHProfRunsInterface {
   private $dir = '';
