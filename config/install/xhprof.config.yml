@@ -1,0 +1,4 @@
+xhprof_enabled: false
+xhprof_disable_admin_paths: false
+xhprof_interval: ''
+xhprof_default_class: Drupal\xhprof\Runs\XHProfRunsFile

@@ -10,18 +10,15 @@
 function xhprof_drush_command() {
   $items['xhprof-list'] = array(
     'description' => dt(''),
-    'arguments' => array(
-    ),
+    'arguments' => array(),
   );
   $items['xhprof-combine'] = array(
     'description' => dt(''),
-    'arguments' => array(
-    ),
+    'arguments' => array(),
   );
   $items['xhprof-clear'] = array(
     'description' => dt(''),
-    'arguments' => array(
-    ),
+    'arguments' => array(),
   );
   return $items;
 }
@@ -48,7 +45,9 @@ function drush_xhprof_combine() {
       else {
         // TODO: This doesn't work. Probably going to have to use drush_choice_multiple.
         $ids = explode(",", $choice);
-        foreach ($ids as $id) $run_ids[] = $options[$id];
+        foreach ($ids as $id) {
+          $run_ids[] = $options[$id];
+        }
       }
     }
   }
@@ -109,7 +108,9 @@ function drush_xhprof_list() {
   foreach ($runs as $run) {
     $row = array();
     foreach ($run as $key => $value) {
-      if (!in_array($key, $headers)) $headers[] = $key;
+      if (!in_array($key, $headers)) {
+        $headers[] = $key;
+      }
 
       $row[] = $value;
     }
@@ -142,9 +143,12 @@ function drush_xhprof_get_dir() {
 function drush_xhprof_list_run_files() {
   $dir = drush_xhprof_get_dir();
   $files = array();
-  foreach (glob("{$dir}/*.xhprof") as $file) $files[] = $file;
+  foreach (glob("{$dir}/*.xhprof") as $file) {
+    $files[] = $file;
+  }
   return $files;
 }
+
 function drush_xhprof_get_runs() {
   $dir = drush_xhprof_get_dir();
   $run_ids = array();

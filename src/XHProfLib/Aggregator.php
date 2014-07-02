@@ -1,14 +1,27 @@
 <?php
 
-class XHProfAggregator {
+namespace Drupal\xhprof\XHProfLib;
+
+use Drupal\xhprof\XHProfLib\Runs\FileRuns;
+
+class Aggregator {
   public $runs = array();
+
+  /**
+   * An instance of a class that implements XHProfRunsInterface.
+   */
+  protected $xhprof_runs_class;
+
+  public function __construct() {
+    $this->xhprof_runs = new FileRuns();
+  }
 
   /**
    * @param $run_data
    * @return void
    */
-  public function addRun($run_data) {
-    $this->runs[] = $run_data;
+  public function addRun($run_id, $namespace) {
+    $this->runs[] = array('run_id' => $run_id, 'namespace' => $namespace);
   }
 
   /**
@@ -59,33 +72,39 @@ class XHProfAggregator {
 
 
   /**
+   * @param bool $skip_bad_runs
+   *  Set to TRUE to prevent this method from failing in the case of a bad run
+   *  (i.e. a corrupt, unserializable file).
    * @return array
    */
-  public function sum() {
+  public function sum($skip_bad_runs = FALSE) {
     $keys = array();
-    foreach ($this->runs as $data) {
-      $keys = $keys + array_keys($data);
-    }
-
     $agg_run = array();
-    foreach ($keys as $key) {
-      $agg_key = array();
-      // Check which runs have this parent_child function key, collect metrics if so.
-      foreach ($this->runs as $data) {
-        if (isset($data[$key])) {
-          foreach ($data[$key] as $metric => $val) {
-            $agg_key[$metric][] = $val;
+    foreach ($this->runs as $run) {
+      try {
+        $run = $this->xhprof_runs->getRun($run['run_id'], $run['namespace']);
+      }
+      catch (\UnexpectedValueException $e) {
+        if ($skip_bad_runs) {
+          continue;
+        }
+        else {
+          throw $e;
+        }
+      }
+      $keys = $run->getKeys();
+
+      foreach ($keys as $key) {
+        foreach ($run->getMetrics($key) as $metric => $val) {
+          if (isset($agg_run[$key][$metric])) {
+            $agg_run[$key][$metric] += $val;
+          }
+          else {
+            $agg_run[$key][$metric] = $val;
           }
         }
       }
-
-      // Sum each metric for the key into the aggregated run.
-      $agg_run[$key] = array();
-      foreach ($agg_key as $metric => $vals) {
-        $agg_run[$key][$metric] = array_sum($vals);
-      }
     }
-
     return $agg_run;
   }
 
@@ -101,3 +120,4 @@ class XHProfAggregator {
     return sqrt(array_sum(array_map(array('XHProfTools', 'sd_square'), $array, array_fill(0, count($array), (array_sum($array) / count($array))))) / (count($array)-1));
   }
 }
+

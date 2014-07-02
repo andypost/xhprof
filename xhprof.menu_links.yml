@@ -1,0 +1,5 @@
+xhprof.admin_configure:
+  title: 'XHProf'
+  description: 'Configure XHProf profiler settings.'
+  route_name: xhprof.admin_configure
+  parent: system.admin_config_development

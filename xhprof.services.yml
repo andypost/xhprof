@@ -1,0 +1,11 @@
+services:
+
+  xhprof.xhprof:
+      class: Drupal\xhprof\XHProfLib\XHProf
+      arguments: ['@config.factory']
+
+  xhprof.eventSubscriber:
+      class: Drupal\xhprof\EventSubscriber\XHProfEventSubscriber
+      arguments: ['@xhprof.xhprof', '@current_user', '@url_generator']
+      tags:
+        - { name: event_subscriber }

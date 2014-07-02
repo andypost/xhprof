@@ -1,6 +1,8 @@
 <?php
 
-class XHProfDiffParser {
+namespace Drupal\xhprof\XHProfLib\Parser;
+
+class DiffParser {
   public $parser1;
   public $parser2;
   public $totals = array();
