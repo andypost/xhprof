@@ -2,6 +2,7 @@
 
 namespace Drupal\xhprof\EventSubscriber;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\xhprof\XHProfLib\XHProf;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +12,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class XHProfEventSubscriber
@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class XHProfEventSubscriber implements EventSubscriberInterface {
 
   /**
-   * @var XHProf
+   * @var \Drupal\xhprof\XHProfLib\XHProf
    */
   public $xhprof;
 
@@ -36,61 +36,77 @@ class XHProfEventSubscriber implements EventSubscriberInterface {
   /**
    * @var string
    */
-  private $xhprof_run_id;
+  private $xhprofRunId;
 
-  public function __construct(XHProf $xhprof, AccountInterface $currentUser, UrlGeneratorInterface $urlGenerator) {
+  /**
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  private $moduleHandler;
+
+  /**
+   * @param \Drupal\xhprof\XHProfLib\XHProf $xhprof
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   */
+  public function __construct(XHProf $xhprof, AccountInterface $currentUser, ModuleHandlerInterface $module_handler) {
     $this->xhprof = $xhprof;
     $this->currentUser = $currentUser;
-    $this->urlGenerator = $urlGenerator;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
-   * @param GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    */
   public function onKernelRequest(GetResponseEvent $event) {
     $this->xhprof->enable();
   }
 
   /**
-   * @param FilterResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event
    */
   public function onKernelResponse(FilterResponseEvent $event) {
     if ($this->xhprof->isEnabled()) {
-      $response = $event->getResponse();
-      $this->xhprof_run_id = $this->runId();
+      $this->xhprofRunId = $this->xhprof->getRunId();
 
-      // Try not to break non html pages.
-      $formats = array(
-        'xml',
-        'javascript',
-        'json',
-        'plain',
-        'image',
-        'application',
-        'csv',
-        'x-comma-separated-values'
-      );
-      foreach ($formats as $format) {
-        if ($response->headers->get($format)) {
-          return;
+      // Don't print the link to xhprof run page if
+      // Webprofiler module is enabled, a widget will
+      // be rendered into Webprofiler toolbar.
+      if (!$this->moduleHandler->moduleExists('webprofiler')) {
+        $response = $event->getResponse();
+
+        // Try not to break non html pages.
+        $formats = array(
+          'xml',
+          'javascript',
+          'json',
+          'plain',
+          'image',
+          'application',
+          'csv',
+          'x-comma-separated-values'
+        );
+        foreach ($formats as $format) {
+          if ($response->headers->get($format)) {
+            return;
+          }
+        }
+
+        if ($this->currentUser->hasPermission('access xhprof data')) {
+          $this->injectLink($response, $this->xhprofRunId);
         }
       }
 
       if (function_exists('drush_log')) {
-        drush_log('xhprof link: ' . $this->xhprof->link($this->xhprof_run_id, 'url'), 'notice');
-      }
-
-      if ($this->currentUser->hasPermission('access xhprof data')) {
-        $this->injectLink($response, $this->xhprof_run_id);
+        drush_log('xhprof link: ' . $this->xhprof->link($this->xhprofRunId, 'url'), 'notice');
       }
     }
   }
 
   /**
-   * @param PostResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
    */
   public function onKernelTerminate(PostResponseEvent $event) {
-    $this->xhprof->shutdown($this->xhprof_run_id);
+    $this->xhprof->shutdown($this->xhprofRunId);
   }
 
   /**
@@ -106,22 +122,16 @@ class XHProfEventSubscriber implements EventSubscriberInterface {
 
   /**
    * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param string $xhprofRunId
    */
-  protected function injectLink(Response $response, $xhprof_run_id) {
+  protected function injectLink(Response $response, $xhprofRunId) {
     $content = $response->getContent();
     $pos = mb_strripos($content, '</body>');
 
     if (FALSE !== $pos) {
-      $output = '<div class="xhprof-ui">' . $this->xhprof->link($xhprof_run_id) . '</div>';
+      $output = '<div class="xhprof-ui">' . $this->xhprof->link($xhprofRunId) . '</div>';
       $content = mb_substr($content, 0, $pos) . $output . mb_substr($content, $pos);
       $response->setContent($content);
     }
-  }
-
-  /**
-   * @return string
-   */
-  private function runId() {
-    return uniqid();
   }
 }

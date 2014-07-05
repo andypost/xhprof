@@ -3,7 +3,7 @@
 namespace Drupal\xhprof\XHProfLib;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\xhprof\XHProfLib\Runs\FileRuns;
+use Drupal\xhprof\XHProfLib\Storage\StorageInterface;
 
 class XHProf {
 
@@ -13,10 +13,28 @@ class XHProf {
   private $configFactory;
 
   /**
-   * @param ConfigFactoryInterface $configFactory
+   * @var StorageInterface
    */
-  public function __construct(ConfigFactoryInterface $configFactory) {
+  private $storage;
+
+  /**
+   * @var array
+   */
+  private $storages;
+
+  /**
+   * @var string
+   */
+  private $runId;
+
+  /**
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param \Drupal\xhprof\XHProfLib\Storage\StorageInterface $storage
+   */
+  public function __construct(ConfigFactoryInterface $configFactory, StorageInterface $storage) {
     $this->configFactory = $configFactory;
+    $this->storage = $storage;
+    $this->storages = array();
   }
 
   /**
@@ -29,6 +47,8 @@ class XHProf {
 
   /**
    * Check whether XHProf should be enabled for the current request.
+   *
+   * @return boolean
    */
   function isEnabled() {
     $enabled = FALSE;
@@ -48,7 +68,7 @@ class XHProf {
   }
 
   /**
-   * @param $run_id
+   * @param string $run_id
    * @param string $type
    *
    * @return string
@@ -61,14 +81,51 @@ class XHProf {
   }
 
   /**
-   * @return mixed
+   * @return array
    */
   public function shutdown($runId) {
     $namespace = $this->configFactory->get('system.site')->get('name'); // namespace for your application
     $xhprof_data = xhprof_disable();
-    //$class = \Drupal::config('xhprof.config')->get('xhprof_default_class');
-    $xhprof_runs = new FileRuns();
-    return $xhprof_runs->saveRun($xhprof_data, $namespace, $runId);
+    return $this->storage->saveRun($xhprof_data, $namespace, $runId);
   }
 
+  /**
+   * @return array
+   */
+  public function getStorages() {
+    $output = array();
+
+    /** @var \Drupal\xhprof\XHProfLib\Storage\StorageInterface $storage */
+    foreach ($this->storages as $id => $storage) {
+      $output[$id] = $storage->getName();
+    }
+
+    return $output;
+  }
+
+  /**
+   * @param \Drupal\xhprof\XHProfLib\Storage\StorageInterface $storage
+   */
+  public function addStorage($id, StorageInterface $storage) {
+    $this->storages[$id] = $storage;
+  }
+
+  /**
+   * @return \Drupal\xhprof\XHProfLib\Storage\StorageInterface
+   */
+  public function getActiveStorage() {
+    $id = $this->configFactory->get('xhprof.config')->get('xhprof_storage');
+    return $this->storages[$id];
+  }
+
+  /**
+   * @return string
+   */
+  public function getRunId() {
+    if(!$this->runId) {
+      $this->runId = uniqid();
+    }
+
+    return $this->runId;
+  }
 }

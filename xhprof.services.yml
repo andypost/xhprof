@@ -1,11 +1,28 @@
 services:
 
+  xhprof.file_storage:
+      class: Drupal\xhprof\XHProfLib\Storage\FileStorage
+      tags:
+        - { name: xhprof_storage }
+
+  xhprof.storage:
+      class: Drupal\xhprof\XHProfLib\Storage\StorageInterface
+      factory_class: Drupal\xhprof\XHProfLib\Storage\StorageFactory
+      factory_method: getStorage
+      arguments: ['@config.factory', '@service_container']
+
   xhprof.xhprof:
       class: Drupal\xhprof\XHProfLib\XHProf
-      arguments: ['@config.factory']
+      arguments: ['@config.factory', '@xhprof.storage']
 
   xhprof.eventSubscriber:
       class: Drupal\xhprof\EventSubscriber\XHProfEventSubscriber
-      arguments: ['@xhprof.xhprof', '@current_user', '@url_generator']
+      arguments: ['@xhprof.xhprof', '@current_user', '@module_handler']
       tags:
         - { name: event_subscriber }
+
+  xhprof.run_converter:
+      class: Drupal\xhprof\Routing\RunConverter
+      arguments: ['@xhprof.xhprof', '@config.factory']
+      tags:
+        - { name: paramconverter }

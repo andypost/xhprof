@@ -3,3 +3,9 @@ xhprof.admin_configure:
   description: 'Configure XHProf profiler settings.'
   route_name: xhprof.admin_configure
   parent: system.admin_config_development
+
+xhprof.runs:
+  title: 'XHProf'
+  description: 'List XHProf collected profiles.'
+  route_name: xhprof.runs
+  parent: system.admin_reports

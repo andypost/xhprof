@@ -3,6 +3,9 @@
 namespace Drupal\xhprof\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\xhprof\XHProfLib\Run;
+use Drupal\xhprof\XHProfLib\XHProf;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class XHProfController
@@ -10,26 +13,32 @@ use Drupal\Core\Controller\ControllerBase;
 class XHProfController extends ControllerBase {
 
   /**
+   * @var \Drupal\xhprof\XHProfLib\XHProf
+   */
+  private $xhprof;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('xhprof.xhprof')
+    );
+  }
+
+  /**
+   * @param \Drupal\xhprof\XHProfLib\XHProf $xhprof
+   */
+  public function __construct(XHProf $xhprof) {
+    $this->xhprof = $xhprof;
+  }
+
+  /**
    *
    */
   public function runsAction() {
-    global $pager_page_array, $pager_total, $pager_total_items;
-    xhprof_include();
-    $page = isset($_GET['page']) ? $_GET['page'] : '';
-    $element = 0;
-    $limit = 50;
+    $runs = $run = $this->xhprof->getActiveStorage()->getRuns();
 
-    $class = $this->config('xhprof.config')->get('xhprof_default_class');
-    $xhprof_runs_impl = new $class();
-    $pager_page_array = array($page);
-    $pager_total_items[$element] = $xhprof_runs_impl->getCount();
-    $pager_total[$element] = ceil($pager_total_items[$element] / $limit);
-    $pager_start = $page * 50;
-    $pager_end = $pager_start + 50;
-    $runs = $xhprof_runs_impl->getRuns(array(), $limit);
-
-    // Set the pager info in these globals since we need to fake them for
-    // theme_pager.
     // Table attributes
     $attributes = array('id' => 'xhprof-runs-table');
 
@@ -50,40 +59,50 @@ class XHProfController extends ControllerBase {
       $rows[] = $row;
     }
 
-    $output = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
-    $output .= theme('pager');
-    return $output;
+    $build['table'] = array(
+      '#type' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#attributes' => $attributes
+    );
+
+    return $build;
   }
 
   /**
-   * @param $run_id
+   * @param \Drupal\xhprof\XHProfLib\Run $run
    *
    * @return string
    */
-  public function viewAction($run_id) {
-    drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
-    return xhprof_display_run(array($run_id), NULL);
+  public function viewAction(Run $run) {
+    //drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
+
+    //var_dump($run->getKeys());
+
+    return ''; //xhprof_display_run(array($run_id), NULL);
   }
 
   /**
-   * @param $run1
-   * @param $run2
+   * @param \Drupal\xhprof\XHProfLib\Run $run1
+   * @param \Drupal\xhprof\XHProfLib\Run $run2
    *
    * @return string
    */
-  public function diffAction($run1, $run2) {
-    drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
-    return xhprof_display_run(array($run1, $run2), $symbol = NULL);
+  public function diffAction(Run $run1, Run $run2) {
+    //drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
+
+    return ''; //xhprof_display_run(array($run1, $run2), $symbol = NULL);
   }
 
   /**
-   * @param $run_id
+   * @param \Drupal\xhprof\XHProfLib\Run $run
    * @param $symbol
    *
    * @return string
    */
-  public function pageAction($run_id, $symbol) {
-    drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
-    return xhprof_display_run(array($run_id), $symbol);
+  public function symbolAction(Run $run, $symbol) {
+    //drupal_add_css(drupal_get_path('module', 'xhprof') . '/xhprof.css');
+
+    return ''; //xhprof_display_run(array($run_id), $symbol);
   }
 }

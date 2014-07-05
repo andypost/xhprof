@@ -12,6 +12,6 @@ xhprof.config:
     xhprof_interval:
       type: string
       label: 'The approximate number of requests between XHProf samples. Leave empty to profile all requests'
-    xhprof_default_class:
+    xhprof_storage:
       type: string
-      label: 'Choose an XHProf runs class'
+      label: 'Choose the XHProf storage class'

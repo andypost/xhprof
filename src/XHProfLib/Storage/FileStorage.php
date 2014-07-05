@@ -1,13 +1,24 @@
 <?php
 
-namespace Drupal\xhprof\XHProfLib\Runs;
+namespace Drupal\xhprof\XHProfLib\Storage;
 
 use Drupal\xhprof\XHProfLib\Run;
 
-class FileRuns implements RunsInterface {
+class FileStorage implements StorageInterface {
+
+  /**
+   * @var string
+   */
   private $dir;
+
+  /**
+   * @var string
+   */
   private $suffix;
 
+  /**
+   * @param string $dir
+   */
   public function __construct($dir = NULL) {
     if ($dir) {
       $this->dir = $dir;
@@ -18,15 +29,16 @@ class FileRuns implements RunsInterface {
     $this->suffix = 'xhprof';
   }
 
-  private function fileName($run_id, $namespace) {
-    $file = implode('.', array($run_id, $namespace, $this->suffix));
-
-    if (!empty($this->dir)) {
-      $file = $this->dir . "/" . $file;
-    }
-    return $file;
+  /**
+   * {@inheritdoc}
+   */
+  public function getName() {
+    return 'File Storage';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getRun($run_id, $namespace) {
     $file_name = $this->fileName($run_id, $namespace);
 
@@ -45,6 +57,9 @@ class FileRuns implements RunsInterface {
     return $run;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getRuns($namespace = NULL) {
     $files = $this->scanXHProfDir($this->dir, $namespace);
     $files = array_map(function ($f) {
@@ -55,7 +70,7 @@ class FileRuns implements RunsInterface {
   }
 
   /**
-   * Mostly borrowed from the original XHProfRuns_Default class.
+   * {@inheritdoc}
    */
   public function saveRun($data, $namespace, $run_id) {
     // Use PHP serialize function to store the XHProf's
@@ -76,7 +91,13 @@ class FileRuns implements RunsInterface {
     return $run_id;
   }
 
-  public function scanXHProfDir($dir, $namespace = NULL) {
+  /**
+   * @param string $dir
+   * @param string $namespace
+   *
+   * @return array
+   */
+  private function scanXHProfDir($dir, $namespace = NULL) {
     $runs = array();
     if (is_dir($dir)) {
       foreach (glob("{$this->dir}/*.{$this->suffix}") as $file) {
@@ -90,6 +111,21 @@ class FileRuns implements RunsInterface {
       }
     }
     return array_reverse($runs);
+  }
+
+  /**
+   * @param string $run_id
+   * @param string $namespace
+   *
+   * @return string
+   */
+  private function fileName($run_id, $namespace) {
+    $file = implode('.', array($run_id, $namespace, $this->suffix));
+
+    if (!empty($this->dir)) {
+      $file = $this->dir . "/" . $file;
+    }
+    return $file;
   }
 }
 

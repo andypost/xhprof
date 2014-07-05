@@ -3,8 +3,34 @@
 namespace Drupal\xhprof\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\xhprof\XHProfLib\XHProf;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Class ConfigForm
+ */
 class ConfigForm extends ConfigFormBase {
+
+  /**
+   * @var \Drupal\xhprof\XHProfLib\XHProf
+   */
+  private $xhprof;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('xhprof.xhprof')
+    );
+  }
+
+  /**
+   * @param \Drupal\xhprof\XHProfLib\XHProf $xhprof
+   */
+  public function __construct(XHProf $xhprof) {
+    $this->xhprof = $xhprof;
+  }
 
   /**
    * {@inheritdoc}
@@ -52,17 +78,26 @@ class ConfigForm extends ConfigFormBase {
       '#description' => $this->t('The approximate number of requests between XHProf samples. Leave empty to profile all requests'),
     );
 
-    $classes = xhprof_get_classes();
-    $options = array_combine($classes, $classes);
-    $form['settings']['xhprof_default_class'] = array(
+    $options = $this->xhprof->getStorages();
+    $form['settings']['xhprof_storage'] = array(
       '#type' => 'radios',
       '#title' => $this->t('XHProf storage'),
-      '#default_value' => $config->get('xhprof_default_class'),
+      '#default_value' => $config->get('xhprof_storage'),
       '#options' => $options,
-      '#description' => $this->t('Choose an XHProf runs class.'),
+      '#description' => $this->t('Choose the XHProf storage class.'),
     );
 
     return parent::buildForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, array &$form_state) {
+    // TODO: Simplify this.
+    if (isset($form_state['values']['xhprof_interval']) && $form_state['values']['xhprof_interval'] != '' && (!is_numeric($form_state['values']['xhprof_interval']) || $form_state['values']['xhprof_interval'] <= 0 || $form_state['values']['xhprof_interval'] > mt_getrandmax())) {
+      $this->setFormError('xhprof_interval', $form_state, $this->t('The profiling interval must be set to a positive integer.'));
+    }
   }
 
   /**
@@ -73,7 +108,7 @@ class ConfigForm extends ConfigFormBase {
       ->set('xhprof_enabled', $form_state['values']['xhprof_enabled'])
       ->set('xhprof_disable_admin_paths', $form_state['values']['xhprof_disable_admin_paths'])
       ->set('xhprof_interval', $form_state['values']['xhprof_interval'])
-      ->set('xhprof_default_class', $form_state['values']['xhprof_default_class'])
+      ->set('xhprof_storage', $form_state['values']['xhprof_storage'])
       ->save();
 
     parent::submitForm($form, $form_state);

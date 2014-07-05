@@ -16,18 +16,26 @@ xhprof.runs:
     _permission: 'access xhprof data'
 
 xhprof.view:
-  path: '/admin/reports/xhprof/{run_id}'
+  path: '/admin/reports/xhprof/{run}'
   defaults:
     _content: 'Drupal\xhprof\Controller\XHProfController::viewAction'
     _title: 'XHProf view'
+  options:
+    parameters:
+      run:
+        type: 'xhprof:run_id'
   requirements:
     _permission: 'access xhprof data'
 
-xhprof.page:
-  path: '/admin/reports/xhprof/{run_id}/symbol/{symbol}'
+xhprof.symbol:
+  path: '/admin/reports/xhprof/{run}/symbol/{symbol}'
   defaults:
-    _content: 'Drupal\xhprof\Controller\XHProfController::pageAction'
+    _content: 'Drupal\xhprof\Controller\XHProfController::symbolAction'
     _title: 'XHProf view'
+  options:
+    parameters:
+      run:
+        type: 'xhprof:run_id'
   requirements:
     _permission: 'access xhprof data'
 
@@ -36,5 +44,11 @@ xhprof.diff:
   defaults:
     _content: 'Drupal\xhprof\Controller\XHProfController::diffAction'
     _title: 'XHProf view'
+  options:
+    parameters:
+      run1:
+        type: 'xhprof:run_id'
+      run1:
+        type: 'xhprof:run_id'
   requirements:
     _permission: 'access xhprof data'
