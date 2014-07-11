@@ -1,4 +1,4 @@
 enabled: false
 interval: ''
 storage: xhprof.file_storage
-exclude: "/contextual/*\r\n/toolbar/*\r\n/edit/*\r\n*.js\r\n*.css\r\n/admin/*"
+exclude: "/contextual/*\r\n/toolbar/*\r\n/edit/*\r\n/admin/*\r\n/profiler/*\r\n*.js\r\n*.css"
