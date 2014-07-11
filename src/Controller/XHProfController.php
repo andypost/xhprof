@@ -292,6 +292,11 @@ class XHProfController extends ControllerBase {
     return $rows;
   }
 
+  /**
+   * @param string $class
+   *
+   * @return string
+   */
   private function abbrClass($class) {
     $parts = explode('\\', $class);
     $short = array_pop($parts);
