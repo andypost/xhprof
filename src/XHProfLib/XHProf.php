@@ -4,6 +4,9 @@ namespace Drupal\xhprof\XHProfLib;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\xhprof\XHProfLib\Storage\StorageInterface;
+use Drupal\xhprof\XHProfLib\Report\ReportEngine;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 
 class XHProf {
 
@@ -18,9 +21,9 @@ class XHProf {
   private $storage;
 
   /**
-   * @var array
+   * @var \Symfony\Component\HttpFoundation\RequestMatcherInterface
    */
-  private $storages;
+  private $requestMatcher;
 
   /**
    * @var string
@@ -28,13 +31,19 @@ class XHProf {
   private $runId;
 
   /**
+   * @var bool
+   */
+  private $enabled = FALSE;
+
+  /**
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    * @param \Drupal\xhprof\XHProfLib\Storage\StorageInterface $storage
+   * @param \Symfony\Component\HttpFoundation\RequestMatcherInterface $requestMatcher
    */
-  public function __construct(ConfigFactoryInterface $configFactory, StorageInterface $storage) {
+  public function __construct(ConfigFactoryInterface $configFactory, StorageInterface $storage, RequestMatcherInterface $requestMatcher) {
     $this->configFactory = $configFactory;
     $this->storage = $storage;
-    $this->storages = array();
+    $this->requestMatcher = $requestMatcher;
   }
 
   /**
@@ -43,28 +52,50 @@ class XHProf {
   public function enable() {
     // @todo: consider a variable per-flag instead.
     xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+
+    $this->enabled = TRUE;
   }
 
   /**
-   * Check whether XHProf should be enabled for the current request.
+   * @return array
+   */
+  public function shutdown($runId) {
+    $namespace = $this->configFactory->get('system.site')->get('name');
+    $xhprof_data = xhprof_disable();
+
+    $this->enabled = TRUE;
+
+    return $this->storage->saveRun($xhprof_data, $namespace, $runId);
+  }
+
+  /**
+   * Check whether XHProf is enabled.
    *
    * @return boolean
    */
-  function isEnabled() {
-    $enabled = FALSE;
+  public function isEnabled() {
+    return $this->enabled;
+  }
+
+  /**
+   * @param Request $request
+   *
+   * @return bool
+   */
+  public function canEnable(Request $request) {
     $config = $this->configFactory->get('xhprof.config');
 
-    if (extension_loaded('xhprof') && $config->get('xhprof_enabled')) {
-      $enabled = TRUE;
-      if (arg(0) == 'admin' && $config->get('xhprof_disable_admin_paths')) {
-        $enabled = FALSE;
-      }
-      $interval = $config->get('xhprof_interval');
+    if (extension_loaded('xhprof') && $config->get('enabled') && $this->requestMatcher->matches($request)) {
+      $interval = $config->get('interval');
+
       if ($interval && mt_rand(1, $interval) % $interval != 0) {
-        $enabled = FALSE;
+        return FALSE;
       }
+
+      return TRUE;
     }
-    return $enabled;
+
+    return FALSE;
   }
 
   /**
@@ -73,7 +104,7 @@ class XHProf {
    *
    * @return string
    */
-  function link($run_id, $type = 'link') {
+  public function link($run_id, $type = 'link') {
     $url = url(XHPROF_PATH . '/' . $run_id, array(
       'absolute' => TRUE,
     ));
@@ -81,51 +112,28 @@ class XHProf {
   }
 
   /**
-   * @return array
-   */
-  public function shutdown($runId) {
-    $namespace = $this->configFactory->get('system.site')->get('name'); // namespace for your application
-    $xhprof_data = xhprof_disable();
-    return $this->storage->saveRun($xhprof_data, $namespace, $runId);
-  }
-
-  /**
-   * @return array
-   */
-  public function getStorages() {
-    $output = array();
-
-    /** @var \Drupal\xhprof\XHProfLib\Storage\StorageInterface $storage */
-    foreach ($this->storages as $id => $storage) {
-      $output[$id] = $storage->getName();
-    }
-
-    return $output;
-  }
-
-  /**
-   * @param \Drupal\xhprof\XHProfLib\Storage\StorageInterface $storage
-   */
-  public function addStorage($id, StorageInterface $storage) {
-    $this->storages[$id] = $storage;
-  }
-
-  /**
    * @return \Drupal\xhprof\XHProfLib\Storage\StorageInterface
    */
-  public function getActiveStorage() {
-    $id = $this->configFactory->get('xhprof.config')->get('xhprof_storage');
-    return $this->storages[$id];
+  public function getStorage() {
+    return $this->storage;
   }
 
   /**
    * @return string
    */
   public function getRunId() {
-    if(!$this->runId) {
+    return $this->runId;
+  }
+
+  /**
+   * @return string
+   */
+  public function createRunId() {
+    if (!$this->runId) {
       $this->runId = uniqid();
     }
 
     return $this->runId;
   }
+
 }

@@ -19,11 +19,11 @@ class StoragePass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container) {
     // configure the xhprof.xhprof service
-    if (FALSE === $container->hasDefinition('xhprof.xhprof')) {
+    if (FALSE === $container->hasDefinition('xhprof.storage_manager')) {
       return;
     }
 
-    $definition = $container->getDefinition('xhprof.xhprof');
+    $definition = $container->getDefinition('xhprof.storage_manager');
 
     foreach ($container->findTaggedServiceIds('xhprof_storage') as $id => $attributes) {
       $definition->addMethodCall('addStorage', array($id, new Reference($id)));

@@ -61,4 +61,14 @@ class Run {
     return $this->data;
   }
 
+  /**
+   * @return string
+   */
+  public function getId() {
+    return $this->run_id;
+  }
+
+  public function __toString() {
+    return 'pippo';
+  }
 }

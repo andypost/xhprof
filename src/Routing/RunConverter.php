@@ -35,7 +35,7 @@ class RunConverter implements ParamConverterInterface {
   public function convert($value, $definition, $name, array $defaults, Request $request) {
     try {
       $namespace = $this->configFactory->get('system.site')->get('name');
-      return $this->xhprof->getActiveStorage()->getRun($value, $namespace);
+      return $this->xhprof->getStorage()->getRun($value, $namespace);
     } catch(\Exception $e) {
       return NULL;
     }

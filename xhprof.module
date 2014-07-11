@@ -12,31 +12,3 @@ function xhprof_permission() {
     ),
   );
 }
-
-/**
- * Implementation of hook_theme()
- */
-function xhprof_theme() {
-  return array(
-    'xhprof_overall_summary' => array(
-      'template' => 'xhprof_overall_summary',
-      'variables' => array(
-        'totals' => NULL,
-        'possible_metrics' => NULL,
-        'metrics' => NULL,
-        'display_calls' => NULL
-      ),
-    ),
-    'xhprof_run_table' => array(
-      'template' => 'xhprof_run_table',
-      'variables' => array(
-        'stats' => NULL,
-        'totals' => NULL,
-        'url_params' => NULL,
-        'title' => NULL,
-        'flat_data' => NULL,
-        'limit' => NULL
-      ),
-    ),
-  );
-}

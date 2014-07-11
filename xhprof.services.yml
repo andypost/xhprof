@@ -1,28 +1,38 @@
 services:
 
   xhprof.file_storage:
-      class: Drupal\xhprof\XHProfLib\Storage\FileStorage
-      tags:
-        - { name: xhprof_storage }
+    class: Drupal\xhprof\XHProfLib\Storage\FileStorage
+    tags:
+      - { name: xhprof_storage }
 
   xhprof.storage:
-      class: Drupal\xhprof\XHProfLib\Storage\StorageInterface
-      factory_class: Drupal\xhprof\XHProfLib\Storage\StorageFactory
-      factory_method: getStorage
-      arguments: ['@config.factory', '@service_container']
+    class: Drupal\xhprof\XHProfLib\Storage\StorageInterface
+    factory_class: Drupal\xhprof\XHProfLib\Storage\StorageFactory
+    factory_method: getStorage
+    arguments: ['@config.factory', '@service_container']
+
+  xhprof.storage_manager:
+    class: Drupal\xhprof\XHProfLib\Storage\StorageManager
+
+  xhprof.report_engine:
+    class: Drupal\xhprof\XHProfLib\Report\ReportEngine
+
+  xhprof.matcher:
+    class: Drupal\xhprof\RequestMatcher\XHProfRequestMatcher
+    arguments: ['@config.factory', '@path.matcher']
 
   xhprof.xhprof:
-      class: Drupal\xhprof\XHProfLib\XHProf
-      arguments: ['@config.factory', '@xhprof.storage']
+    class: Drupal\xhprof\XHProfLib\XHProf
+    arguments: ['@config.factory', '@xhprof.storage', '@xhprof.matcher']
 
   xhprof.eventSubscriber:
-      class: Drupal\xhprof\EventSubscriber\XHProfEventSubscriber
-      arguments: ['@xhprof.xhprof', '@current_user', '@module_handler']
-      tags:
-        - { name: event_subscriber }
+    class: Drupal\xhprof\EventSubscriber\XHProfEventSubscriber
+    arguments: ['@xhprof.xhprof', '@current_user', '@module_handler']
+    tags:
+      - { name: event_subscriber }
 
   xhprof.run_converter:
-      class: Drupal\xhprof\Routing\RunConverter
-      arguments: ['@xhprof.xhprof', '@config.factory']
-      tags:
-        - { name: paramconverter }
+    class: Drupal\xhprof\Routing\RunConverter
+    arguments: ['@xhprof.xhprof', '@config.factory']
+    tags:
+      - { name: paramconverter }

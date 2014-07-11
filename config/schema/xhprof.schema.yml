@@ -3,15 +3,15 @@ xhprof.config:
   type: mapping
   label: 'XHProf configuration'
   mapping:
-    xhprof_enabled:
+    enabled:
       type: boolean
       label: 'XHProf enabled'
-    xhprof_disable_admin_paths:
-      type: boolean
-      label: 'Disable profiling of admin pages'
-    xhprof_interval:
+    interval:
       type: string
       label: 'The approximate number of requests between XHProf samples. Leave empty to profile all requests'
-    xhprof_storage:
+    storage:
       type: string
       label: 'Choose the XHProf storage class'
+    exclude:
+      type: string
+      label: 'Path to exclude'

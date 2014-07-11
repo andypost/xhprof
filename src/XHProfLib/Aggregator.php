@@ -2,9 +2,13 @@
 
 namespace Drupal\xhprof\XHProfLib;
 
-use Drupal\xhprof\XHProfLib\Runs\FileRuns;
+use Drupal\xhprof\XHProfLib\Storage\FileStorage;
 
 class Aggregator {
+
+  /**
+   * @var array
+   */
   public $runs = array();
 
   /**
@@ -13,11 +17,13 @@ class Aggregator {
   protected $xhprof_runs_class;
 
   public function __construct() {
-    $this->xhprof_runs = new FileRuns();
+    $this->xhprof_runs = new FileStorage();
   }
 
   /**
-   * @param $run_data
+   * @param $run_id
+   * @param $namespace
+   *
    * @return void
    */
   public function addRun($run_id, $namespace) {
@@ -33,11 +39,11 @@ class Aggregator {
       $keys = $keys + array_keys($data);
     }
     $agg_run = array();
-    $run_count = count($runs);
+    $run_count = count($this->runs);
     foreach ($keys as $key) {
       $agg_key = array();
       // Check which runs have this parent_child function key, collect metrics if so.
-      foreach ($runs as $data) {
+      foreach ($this->runs as $data) {
         if (isset($data[$key])) {
           foreach ($data[$key] as $metric => $val) {
             $agg_key[$metric][] = $val;

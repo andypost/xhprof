@@ -58,7 +58,9 @@ class XHProfEventSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    */
   public function onKernelRequest(GetResponseEvent $event) {
-    $this->xhprof->enable();
+    if($this->xhprof->canEnable($event->getRequest())) {
+      $this->xhprof->enable();
+    }
   }
 
   /**
@@ -66,7 +68,7 @@ class XHProfEventSubscriber implements EventSubscriberInterface {
    */
   public function onKernelResponse(FilterResponseEvent $event) {
     if ($this->xhprof->isEnabled()) {
-      $this->xhprofRunId = $this->xhprof->getRunId();
+      $this->xhprofRunId = $this->xhprof->createRunId();
 
       // Don't print the link to xhprof run page if
       // Webprofiler module is enabled, a widget will
@@ -106,7 +108,9 @@ class XHProfEventSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
    */
   public function onKernelTerminate(PostResponseEvent $event) {
-    $this->xhprof->shutdown($this->xhprofRunId);
+    if ($this->xhprof->isEnabled()) {
+      $this->xhprof->shutdown($this->xhprofRunId);
+    }
   }
 
   /**

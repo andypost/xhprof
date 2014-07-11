@@ -48,7 +48,7 @@ xhprof.diff:
     parameters:
       run1:
         type: 'xhprof:run_id'
-      run1:
+      run2:
         type: 'xhprof:run_id'
   requirements:
     _permission: 'access xhprof data'
