@@ -25,7 +25,7 @@ services:
     class: Drupal\xhprof\XHProfLib\XHProf
     arguments: ['@config.factory', '@xhprof.storage', '@xhprof.matcher']
 
-  xhprof.eventSubscriber:
+  xhprof.xhprof_event_subscriber:
     class: Drupal\xhprof\EventSubscriber\XHProfEventSubscriber
     arguments: ['@xhprof.xhprof', '@current_user', '@module_handler']
     tags:
