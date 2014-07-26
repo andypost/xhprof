@@ -4,4 +4,4 @@ description: 'Provides code profiling with XHProf integration.'
 package: Development
 core: 8.x
 
-configure: admin/config/development/xhprof
+configure: xhprof.admin_configure
