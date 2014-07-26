@@ -1,7 +1,13 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\xhprof\Controller\XHProfController.
+ */
+
 namespace Drupal\xhprof\Controller;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\xhprof\XHProfLib\Report\ReportEngine;
 use Drupal\xhprof\XHProfLib\Report\ReportInterface;
@@ -189,28 +195,20 @@ class XHProfController extends ControllerBase {
   public function viewAction(Run $run) {
     $report = $this->reportEngine->getReport(NULL, NULL, $run, NULL, NULL, 'wt', NULL, NULL);
 
-    $table = $report->getData();
+    $build['#title'] = $this->t('XHProf view report for %id', array('%id' => $run->getId()));
 
-    $build['report'] = array(
-      '#markup' => '<p>' . $this->t('Run report for @id', array('@id' => $run->getId())) . '</p>',
+    $data = $report->getData();
+
+    $build['table'] = array(
+      '#theme' => 'table',
+      '#header' => $this->getHeader($data['symbols']),
+      '#rows' => $this->getRows($data['symbols'], $report),
+      '#attributes' => array('class' => array('responsive')),
       '#attached' => array(
         'library' => array(
           'xhprof/xhprof',
         ),
       ),
-    );
-
-    /*$build['summary'] = array(
-      '#theme' => 'table',
-      '#header' => $run,
-      '#rows' => $summary,
-    );*/
-
-    $build['table'] = array(
-      '#theme' => 'table',
-      '#header' => $this->getHeader($table['symbols']),
-      '#rows' => $this->getRows($table['symbols'], $report),
-      '#attributes' => array('class' => array('responsive'))
     );
 
     return $build;
@@ -302,10 +300,10 @@ class XHProfController extends ControllerBase {
     $short = array_pop($parts);
 
     if (strlen($short) >= 40) {
-      $short = substr($short, 0, 30) . " ... " . substr($short, -5);
+      $short = substr($short, 0, 30) . " … " . substr($short, -5);
     }
 
-    return sprintf("<abbr title=\"%s\">%s</abbr>", $class, $short);
+    return String::format('<abbr title="@class">@short</abbr>', array('@class' => $class, '@short' => $short));
   }
 
   /**
